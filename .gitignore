@@ -1,0 +1,11 @@
+cpp/.idea/
+cpp/cmake-build-debug/
+cpp/cmake-build-release/
+csharp_unity/.idea/
+csharp_unity/bin/
+csharp_unity/Library/
+csharp_unity/Logs/
+csharp_unity/obj/
+*.csproj
+*.sln
+*.user
