@@ -1,0 +1,187 @@
+{
+    "localizations": [
+        {
+            "languageId": 3,
+            "localizedStrings": [
+                {
+                    "id": 1,
+                    "localizedString": "English"
+                },
+                {
+                    "id": 2,
+                    "localizedString": "Use W,A,S,D or arrow keys to move tiles. Two tiles with the same numbers will merge to the tile that will have two times more number. Try to get to the number 2048!"
+                },
+                {
+                    "id": 3,
+                    "localizedString": "New game"
+                },
+                {
+                    "id": 4,
+                    "localizedString": "Current score"
+                },
+                {
+                    "id": 5,
+                    "localizedString": "Best score"
+                },
+                {
+                    "id": 6,
+                    "localizedString": "Language"
+                },
+                {
+                    "id": 7,
+                    "localizedString": "Start bot"
+                },
+                {
+                    "id": 8,
+                    "localizedString": "Stop bot"
+                },
+                {
+                    "id": 9,
+                    "localizedString": "Bot enabled"
+                },
+                {
+                    "id": 10,
+                    "localizedString": "You win!"
+                },
+                {
+                    "id": 11,
+                    "localizedString": "No available moves"
+                },
+                {
+                    "id": 12,
+                    "localizedString": "Score"
+                },
+                {
+                    "id": 13,
+                    "localizedString": "New record!"
+                },
+                {
+                    "id": 14,
+                    "localizedString": "Play again"
+                }
+            ]
+        },
+        {
+            "languageId": 4,
+            "localizedStrings": [
+                {
+                    "id": 1,
+                    "localizedString": "Русский"
+                },
+                {
+                    "id": 2,
+                    "localizedString": "Используйте кнопки W,A,S,D или стрелки, чтобы сдвигать ячейки поля. Две ячейки с одинаковыми цифрами сложатся при этом в одну со вдвое большим числом. Попробуйте собрать число 2048!"
+                },
+                {
+                    "id": 3,
+                    "localizedString": "Новая игра"
+                },
+                {
+                    "id": 4,
+                    "localizedString": "Текущий счет"
+                },
+                {
+                    "id": 5,
+                    "localizedString": "Лучший счет"
+                },
+                {
+                    "id": 6,
+                    "localizedString": "Язык"
+                },
+                {
+                    "id": 7,
+                    "localizedString": "Включить бота"
+                },
+                {
+                    "id": 8,
+                    "localizedString": "Выключить бота"
+                },
+                {
+                    "id": 9,
+                    "localizedString": "Бот включен"
+                },
+                {
+                    "id": 10,
+                    "localizedString": "Вы выиграли!"
+                },
+                {
+                    "id": 11,
+                    "localizedString": "Нет доступных ходов"
+                },
+                {
+                    "id": 12,
+                    "localizedString": "Счет"
+                },
+                {
+                    "id": 13,
+                    "localizedString": "Новый рекорд!"
+                },
+                {
+                    "id": 14,
+                    "localizedString": "Сыграть снова"
+                }
+            ]
+        },
+        {
+            "languageId": 5,
+            "localizedStrings": [
+                {
+                    "id": 1,
+                    "localizedString": "Čeština"
+                },
+                {
+                    "id": 2,
+                    "localizedString": "Použijte klávesy W,A,S,D nebo klávesy se šipkami k posunu buněk. Dvě buňky se stejnými čísly vytvoří buňku s dvojnásobnou hodnotou. Zkuste se dostat k číslu 2048!"
+                },
+                {
+                    "id": 3,
+                    "localizedString": "Nová hra"
+                },
+                {
+                    "id": 4,
+                    "localizedString": "Běžný skóre"
+                },
+                {
+                    "id": 5,
+                    "localizedString": "Nejvyšší skóre"
+                },
+                {
+                    "id": 6,
+                    "localizedString": "Jazyk"
+                },
+                {
+                    "id": 7,
+                    "localizedString": "Spustit bota"
+                },
+                {
+                    "id": 8,
+                    "localizedString": "Zastavit bota"
+                },
+                {
+                    "id": 9,
+                    "localizedString": "Bot je spuštěn"
+                },
+                {
+                    "id": 10,
+                    "localizedString": "Vyhráli jste!"
+                },
+                {
+                    "id": 11,
+                    "localizedString": "Žádný přípustný tah"
+                },
+                {
+                    "id": 12,
+                    "localizedString": "Skóre"
+                },
+                {
+                    "id": 13,
+                    "localizedString": "Nový rekord!"
+                },
+                {
+                    "id": 14,
+                    "localizedString": "Zahrát si znovu"
+                }
+            ]
+        }
+    ]
+}
