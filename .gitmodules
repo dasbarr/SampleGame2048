@@ -1,3 +1,6 @@
 [submodule "cpp/cocos2d"]
 	path = cpp/cocos2d
 	url = https://github.com/cocos2d/cocos2d-x
+[submodule "cpp/third_party/jl_signal"]
+	path = cpp/third_party/jl_signal
+	url = https://github.com/jeffomatic/jl_signal
