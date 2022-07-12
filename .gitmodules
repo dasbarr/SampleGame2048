@@ -4,3 +4,6 @@
 [submodule "cpp/third_party/jl_signal"]
 	path = cpp/third_party/jl_signal
 	url = https://github.com/jeffomatic/jl_signal
+[submodule "cpp/third_party/rapidjson"]
+	path = cpp/third_party/rapidjson
+	url = https://github.com/Tencent/rapidjson
