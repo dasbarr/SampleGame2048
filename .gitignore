@@ -6,6 +6,7 @@ csharp_unity/bin/
 csharp_unity/Library/
 csharp_unity/Logs/
 csharp_unity/obj/
+csharp_unity/Assets/DOTween/
 *.csproj
 *.sln
 *.user
