@@ -1,7 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
 namespace sample_game.utils {
     
     /// <summary>
-    /// Non-unity class that supports dependency injection.
+    /// Non-unity class that supports runtime dependency injection.
     /// </summary>
     public abstract class DependencyInjectable : IDependencyInjectable {
         
@@ -26,6 +31,7 @@ namespace sample_game.utils {
         //-------------------------------------------------------------
         
         protected DependencyInjectable() {
+            _notFulfilledDependencyFields = DependencyInjector.CollectInjectionFields(this);
             PerformInjection();
         }
         
@@ -33,8 +39,7 @@ namespace sample_game.utils {
         // Destructor
         //-------------------------------------------------------------
         
-        ~DependencyInjectable()
-        {
+        ~DependencyInjectable() {
             // object no longer needs dependency fulfillment
             DependencyInjector.DependenciesListUpdated -= PerformInjection;
         }
@@ -42,19 +47,23 @@ namespace sample_game.utils {
         //-------------------------------------------------------------
         // Variables
         //-------------------------------------------------------------
+
+        /// <summary>
+        /// Contains all dependency injection fields that weren't fulfilled yet.
+        /// </summary>
+        private HashSet<FieldInfo> _notFulfilledDependencyFields = null;
         
         //-------------------------------------------------------------
         // Events
         //-------------------------------------------------------------
         
+        public event EventHandler AllDependenciesFulfilled;
+        
         //-------------------------------------------------------------
         // Properties
         //-------------------------------------------------------------
-
-        /// <summary>
-        /// If true, all dependencies are fulfilled.
-        /// </summary>
-        protected bool dependenciesFulfilled { get; private set; } = false;
+        
+        public bool dependenciesFulfilled => _notFulfilledDependencyFields != null && !_notFulfilledDependencyFields.Any();
 
         //-------------------------------------------------------------
         // Public methods
@@ -72,14 +81,15 @@ namespace sample_game.utils {
         /// Injects dependencies to the current instance.
         /// </summary>
         private void PerformInjection() {
-            if (dependenciesFulfilled)
-                return; // already fulfilled
+            // unsubscribe to avoid multiple subscription
+            DependencyInjector.DependenciesListUpdated -= PerformInjection;
             
-            dependenciesFulfilled = DependencyInjector.Inject(this);
+            DependencyInjector.Inject(this, ref _notFulfilledDependencyFields);
 
             if (dependenciesFulfilled) {
-                DependencyInjector.DependenciesListUpdated -= PerformInjection;
+                // all dependencies were fulfilled
                 OnDependenciesFulfilled();
+                AllDependenciesFulfilled?.Invoke(this, EventArgs.Empty);
             }
             else {
                 // maybe dependencies will be fulfilled later

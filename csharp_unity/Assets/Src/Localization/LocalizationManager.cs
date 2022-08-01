@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using sample_game.utils;
 using UnityEngine;
 
 namespace sample_game {
@@ -8,7 +9,7 @@ namespace sample_game {
     /// <summary>
     /// Provides strings for game localization.
     /// </summary>
-    public class LocalizationManager {
+    public class LocalizationManager : DependencyInjectable {
 
         //-------------------------------------------------------------
         // Nested
@@ -25,6 +26,9 @@ namespace sample_game {
         //-------------------------------------------------------------
         // Dependencies
         //-------------------------------------------------------------
+        
+        [DependencyInjector.DependencyAttribute]
+        private GameConfig _gameConfig = default;
         
         //-------------------------------------------------------------
         // Class constants
@@ -44,21 +48,6 @@ namespace sample_game {
         // Constructor/destructor
         //-------------------------------------------------------------
 
-        public LocalizationManager() {
-            // load localizations
-            var localizationsFile = Resources.Load<TextAsset>("Localizations");
-            var localizationsDataContainer = JsonUtility.FromJson<LocalizationsDataContainer>(localizationsFile.text);
-            foreach (var localizationData in localizationsDataContainer.localizations) {
-                var localization = new Localization(localizationData);
-
-                if (localization.languageId != LanguageId.NotSupported)
-                    _localizations[localization.languageId] = localization;
-            }
-            
-            // set initial language
-            SetLanguage(GameConfig.cDefaultLanguageId);
-        }
-        
         //-------------------------------------------------------------
         // Variables
         //-------------------------------------------------------------
@@ -156,5 +145,20 @@ namespace sample_game {
         //-------------------------------------------------------------
         // Handlers
         //-------------------------------------------------------------
+        
+        protected override void OnDependenciesFulfilled() {
+            // load localizations
+            var localizationsFile = Resources.Load<TextAsset>("Localizations");
+            var localizationsDataContainer = JsonUtility.FromJson<LocalizationsDataContainer>(localizationsFile.text);
+            foreach (var localizationData in localizationsDataContainer.localizations) {
+                var localization = new Localization(localizationData);
+
+                if (localization.languageId != LanguageId.NotSupported)
+                    _localizations[localization.languageId] = localization;
+            }
+            
+            // set initial language
+            SetLanguage(_gameConfig.defaultLanguageId);
+        }
     }
 } // namespace sample_game

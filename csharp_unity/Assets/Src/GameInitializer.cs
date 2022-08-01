@@ -23,31 +23,27 @@ namespace sample_game {
         private static void OnApplicationLoaded() {
             Application.targetFrameRate = cTargetFrameRate;
             
-            // make sure that all canvases will have proper size before game initialization
-            Canvas.ForceUpdateCanvases();
-            
-            // init common services
-            ServiceLocator.RegisterService(new LocalizationManager());
-            ServiceLocator.RegisterService(GameObject.FindObjectOfType<InputManager>());
-            
-            // init game services
-            ServiceLocator.RegisterService(new GameBoardProxy());
-            ServiceLocator.RegisterService(new ScoreProxy());
-            ServiceLocator.RegisterService(GameObject.FindObjectOfType<GameView>());
-            
-            var gameController = new GameController();
-            ServiceLocator.RegisterService(gameController);
-            
-            // use simple bot
-            ServiceLocator.RegisterService(BotController.Create<PushTheTempoBot>());
-            
             // init DOTween
             DOTween.Init(false, true, LogBehaviour.ErrorsOnly);
             DOTween.defaultAutoPlay = AutoPlay.None;
             DOTween.defaultUpdateType = UpdateType.Normal;
-
-            // start the game
-            gameController.StartNewGame();
+            
+            // make sure that all canvases will have proper size before game initialization
+            Canvas.ForceUpdateCanvases();
+            
+            // game config
+            ServiceLocator.AddService(Resources.Load<GameConfig>("GameConfig"));
+            
+            // init common services
+            ServiceLocator.AddService(new LocalizationManager());
+            
+            // init game services
+            ServiceLocator.AddService(new GameBoardProxy());
+            ServiceLocator.AddService(new ScoreProxy());
+            ServiceLocator.AddService(new GameController());
+            
+            // init simple bot
+            ServiceLocator.AddService(BotController.Create<PushTheTempoBot>());
         }
     }
 } // namespace sample_game

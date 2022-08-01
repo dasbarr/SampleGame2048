@@ -1,4 +1,5 @@
 using System;
+using sample_game.utils;
 using UnityEngine;
 
 namespace sample_game {
@@ -80,6 +81,11 @@ namespace sample_game {
         //-------------------------------------------------------------
         // Unity methods
         //-------------------------------------------------------------
+
+        private void Awake() {
+            // register itself as a service
+            ServiceLocator.AddService(this);
+        }
 
         private void OnUp() {
             DispatchMove(Move.Up);

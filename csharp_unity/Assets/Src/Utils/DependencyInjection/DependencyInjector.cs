@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace sample_game.utils {
     
     /// <summary>
-    /// Class that performs dependency injection.
+    /// Class that performs runtime dependency injection.
     /// </summary>
     public static class DependencyInjector {
         
@@ -44,16 +45,12 @@ namespace sample_game.utils {
         //-------------------------------------------------------------
 
         /// <summary>
-        /// Injects dependencies if possible.
+        /// Gets all dependency injection fields within a specific object.
         /// </summary>
-        /// <param name="dependencyInjectable">Injection destination.</param>
-        /// <param name="refillAlreadyFilledFields">
-        /// If true, fields that were already fulfilled, will be fulfilled again (and will be set to null
-        /// if fulfillment is not possible).
-        /// </param>
-        /// <returns>True if all dependencies was fulfilled, false otherwise.</returns>
-        public static bool Inject(IDependencyInjectable dependencyInjectable, bool refillAlreadyFilledFields = false) {
-            bool allDependenciesFulfilled = true;
+        /// <param name="dependencyInjectable">Dependency injection fields of that object will be collected.</param>
+        /// <returns>A collection that contains collected dependency injection fields.</returns>
+        public static HashSet<FieldInfo> CollectInjectionFields(IDependencyInjectable dependencyInjectable) {
+            var collectedFields = new HashSet<FieldInfo>();
             
             // If dependencyInjectable has some private dependency fields in parent classes, that fields
             // can't be obtained through DependencyInjectable type - we need to traverse over all parent types.
@@ -62,30 +59,45 @@ namespace sample_game.utils {
             do {
                 // get dependency fields in current type that should be fulfilled
                 var dependencyFieldsToFulfillInCurrentType = currentType.GetFields(
-                    BindingFlags.Public | BindingFlags.NonPublic |
-                    BindingFlags.Instance | BindingFlags.DeclaredOnly
+                    BindingFlags.Public | BindingFlags.NonPublic
+                    | BindingFlags.Instance | BindingFlags.DeclaredOnly
                 ).Where(
-                    // get only fields that has needed attribute and needed to be fulfilled
-                    fieldInfo => fieldInfo.GetCustomAttribute<DependencyAttribute>() != null &&
-                                 (fieldInfo.GetValue(dependencyInjectable) == null || refillAlreadyFilledFields)
+                    // get only fields that has needed attribute and need to be fulfilled
+                    fieldInfo => fieldInfo.GetCustomAttribute<DependencyAttribute>() != null
+                                 && fieldInfo.GetValue(dependencyInjectable) == null
                 );
-
-                foreach (var dependencyField in dependencyFieldsToFulfillInCurrentType) {
-                    var dependency = ServiceLocator.GetService(dependencyField.FieldType);
-                    // set even in case when dependency is null
-                    dependencyField.SetValue(dependencyInjectable, dependency);
-
-                    if (dependency == null) {
-                        // dependency not fulfilled, it will be necessary to try again later
-                        allDependenciesFulfilled = false;
-                    }
-                }
+                
+                collectedFields.UnionWith(dependencyFieldsToFulfillInCurrentType);
 
                 // then start search for dependency fields in parent type
                 currentType = currentType.BaseType;
             } while (currentType != null && typeof(IDependencyInjectable).IsAssignableFrom(currentType));
 
-            return allDependenciesFulfilled;
+            return collectedFields;
+        }
+
+        /// <summary>
+        /// Injects dependencies if possible.
+        /// </summary>
+        /// <param name="dependencyInjectable">Injection destination.</param>
+        /// <param name="fieldsToInject">
+        /// Reference parameter, contains fields that should be fulfilled with dependencies. If dependency was
+        /// injected successfully, that field will be removed from that collection.
+        /// </param>
+        public static void Inject(IDependencyInjectable dependencyInjectable, ref HashSet<FieldInfo> fieldsToInject) {
+            // make a copy (we will change ref collection during injection)
+            foreach (var field in fieldsToInject.ToArray()) {
+                var dependency = field.GetValue(dependencyInjectable);
+                
+                // try to perform injection (if necessary and if possible)
+                if (dependency == default && ServiceLocator.TryGetService(field.FieldType, out dependency))
+                    field.SetValue(dependencyInjectable, dependency);
+
+                if (dependency != default) {
+                    // dependency fulfilled, remove field
+                    fieldsToInject.Remove(field);
+                }
+            }
         }
 
         //-------------------------------------------------------------
@@ -93,17 +105,14 @@ namespace sample_game.utils {
         //-------------------------------------------------------------
         
         static DependencyInjector() {
-            ServiceLocator.OnServicesListUpdated += ServicesListUpdatedHandler;
+            ServiceLocator.NewServiceRegistered += OnNewServiceRegistered;
         }
         
         //-------------------------------------------------------------
         // Handlers
         //-------------------------------------------------------------
         
-        /// <summary>
-        /// Performs an update when number of internal stuff items updated.
-        /// </summary>
-        private static void ServicesListUpdatedHandler() {
+        private static void OnNewServiceRegistered() {
             DependenciesListUpdated?.Invoke();
         }
     }
