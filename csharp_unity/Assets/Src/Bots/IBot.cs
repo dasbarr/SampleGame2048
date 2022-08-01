@@ -13,6 +13,6 @@ namespace sample_game {
         /// <param name="gameBoardState">State of the game board.</param>
         /// <param name="availableMoves">Available moves for that state.</param>
         /// <returns>Next move from that game state.</returns>
-        Move CalcNextMove(List<List<int>> gameBoardState, HashSet<Move> availableMoves);
+        Move CalcNextMove(IReadOnlyList<IReadOnlyList<int>> gameBoardState, HashSet<Move> availableMoves);
     }
 } // namespace sample_game

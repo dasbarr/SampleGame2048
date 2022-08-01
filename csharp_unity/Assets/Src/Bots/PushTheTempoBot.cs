@@ -53,7 +53,7 @@ namespace sample_game {
         // Public methods
         //-------------------------------------------------------------
 
-        public Move CalcNextMove(List<List<int>> gameBoardState, HashSet<Move> availableMoves) {
+        public Move CalcNextMove(IReadOnlyList<IReadOnlyList<int>> gameBoardState, HashSet<Move> availableMoves) {
             return availableMoves.Count > 0
                 ? availableMoves.Shuffle().First()
                 : Move.IncorrectMove;

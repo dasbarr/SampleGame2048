@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using sample_game.utils;
+using UnityEngine.InputSystem.Utilities;
 
 namespace sample_game {
     
     /// <summary>
     /// Representation of the game board - square grid with cells that contain numbers.
     /// </summary>
-    public class GameBoardProxy {
+    public class GameBoardProxy : DependencyInjectable {
         
         //-------------------------------------------------------------
         // Nested
@@ -17,6 +18,9 @@ namespace sample_game {
         //-------------------------------------------------------------
         // Dependencies
         //-------------------------------------------------------------
+        
+        [DependencyInjector.DependencyAttribute]
+        private GameConfig _gameConfig = default;
         
         //-------------------------------------------------------------
         // Class constants
@@ -39,14 +43,6 @@ namespace sample_game {
         // Constructor/destructor
         //-------------------------------------------------------------
 
-        public GameBoardProxy() {
-            // create game board
-            boardState = new List<List<int>>(GameConfig.cGameBoardSize);
-            for (int i = 0; i < GameConfig.cGameBoardSize; i++) {
-                boardState.Add(new int[GameConfig.cGameBoardSize].ToList());
-            }
-        }
-        
         //-------------------------------------------------------------
         // Variables
         //-------------------------------------------------------------
@@ -69,12 +65,13 @@ namespace sample_game {
         // Properties
         //-------------------------------------------------------------
 
+        private List<List<int>> _boardState;
         /// <summary>
         /// Represents current board state. Contains 'power-of-2' values for corresponding tiles (for example,
         /// it will contain 10 for tile number 2^10 = 1024). Note that -1 represents an empty tile. Also note that first
         /// index is the index of the row, second index is the index of column. (0, 0) is the top left cell.
         /// </summary>
-        public List<List<int>> boardState { get; }
+        public IReadOnlyList<IReadOnlyList<int>> boardState => _boardState;
         
         /// <summary>
         /// True if win tile was acquired, false otherwise.
@@ -104,8 +101,8 @@ namespace sample_game {
         /// </summary>
         public void Reset() {
             // empty the board
-            foreach (var row in boardState) {
-                for (var i = 0; i < GameConfig.cGameBoardSize; i++) {
+            foreach (var row in _boardState) {
+                for (var i = 0; i < _gameConfig.gameBoardSize; i++) {
                     row[i] = cEmptyTileValue;
                 }
             }
@@ -113,7 +110,7 @@ namespace sample_game {
             winTileAcquired = false;
             
             // add initial tiles
-            PlaceRandomTiles(GameConfig.cNumInitialRandomTiles);
+            PlaceRandomTiles(_gameConfig.numInitialRandomTiles);
         }
 
         /// <summary>
@@ -123,8 +120,8 @@ namespace sample_game {
         public void PlaceRandomTiles(int numTiles) {
             // find empty tiles
             var emptyTilesCoords = new List<Tuple<int, int>>();
-            for (int i = 0; i < GameConfig.cGameBoardSize; i++) {
-                for (int j = 0; j < GameConfig.cGameBoardSize; j++) {
+            for (int i = 0; i < _gameConfig.gameBoardSize; i++) {
+                for (int j = 0; j < _gameConfig.gameBoardSize; j++) {
                     if (boardState[i][j] == cEmptyTileValue)
                         emptyTilesCoords.Add(new Tuple<int, int>(i, j));
                 }
@@ -134,7 +131,7 @@ namespace sample_game {
             var shuffledEmptyTilesCoords = emptyTilesCoords.Shuffle();
             var numTilesToPlace = Math.Min(numTiles, emptyTilesCoords.Count);
             foreach (var emptyTileCoords in shuffledEmptyTilesCoords.Take(numTilesToPlace)) {
-                boardState[emptyTileCoords.Item1][emptyTileCoords.Item2] = GameConfig.cTileInitialValue;
+                _boardState[emptyTileCoords.Item1][emptyTileCoords.Item2] = _gameConfig.tileInitialValue;
             }
             
             UpdateAvailableMoves();
@@ -155,8 +152,8 @@ namespace sample_game {
                 return false; // can't make a move
             
             // for each row/column tile movement will go from start to end index in the needed direction
-            var startIndex = move == Move.Left || move == Move.Up ? 0 : GameConfig.cGameBoardSize - 1;
-            var endIndex = startIndex == 0 ? GameConfig.cGameBoardSize - 1 : 0;
+            var startIndex = move == Move.Left || move == Move.Up ? 0 : _gameConfig.gameBoardSize - 1;
+            var endIndex = startIndex == 0 ? _gameConfig.gameBoardSize - 1 : 0;
             var delta = startIndex == 0 ? 1 : -1;
             
             var isHorizontalMove = move == Move.Left || move == Move.Right;
@@ -167,10 +164,10 @@ namespace sample_game {
             }
             void SetCellValue(int outerIndex, int index, int value) {
                 if (isHorizontalMove) {
-                    boardState[outerIndex][index] = value;
+                    _boardState[outerIndex][index] = value;
                 }
                 else {
-                    boardState[index][outerIndex] = value;
+                    _boardState[index][outerIndex] = value;
                 }
             }
             Tuple<int, int> PackCellCoords(int outerIndex, int index) {
@@ -182,7 +179,7 @@ namespace sample_game {
             var boardTilesMoveData = new List<BoardTileMoveInfo>();
             
             // outer index corresponds to row index for horizontal moves and column index for vertical moves
-            for (int outerIndex = 0; outerIndex < GameConfig.cGameBoardSize; outerIndex++) {
+            for (int outerIndex = 0; outerIndex < _gameConfig.gameBoardSize; outerIndex++) {
                 int currentIndex = startIndex;
                 do {
                     var currentCellValue = GetCellValue(outerIndex, currentIndex);
@@ -209,7 +206,7 @@ namespace sample_game {
                                 SetCellValue(outerIndex, currentIndex, mergedValue);
 
                                 var scoreToAdd = 1 << mergedValue;
-                                if (scoreToAdd >= GameConfig.cNumberOnWinTile)
+                                if (scoreToAdd >= _gameConfig.numberOnWinTile)
                                     winTileAcquired = true;
                                 moveScore += scoreToAdd;
                                 
@@ -273,8 +270,8 @@ namespace sample_game {
                 return destValue == cEmptyTileValue || destValue == value;
             }
 
-            for (var i = 0; i < GameConfig.cGameBoardSize; i++) {
-                for (var j = 0; j < GameConfig.cGameBoardSize; j++) {
+            for (var i = 0; i < _gameConfig.gameBoardSize; i++) {
+                for (var j = 0; j < _gameConfig.gameBoardSize; j++) {
                     var currentCellValue = boardState[i][j];
                     
                     if (currentCellValue == cEmptyTileValue)
@@ -284,13 +281,13 @@ namespace sample_game {
                     if (j - 1 >= 0 && CheckMoveAvailable(i, j - 1, currentCellValue))
                         availableMoves.Add(Move.Left);
                     // right
-                    if (j + 1 < GameConfig.cGameBoardSize && CheckMoveAvailable(i, j + 1, currentCellValue))
+                    if (j + 1 < _gameConfig.gameBoardSize && CheckMoveAvailable(i, j + 1, currentCellValue))
                         availableMoves.Add(Move.Right);
                     // up
                     if (i - 1 >= 0 && CheckMoveAvailable(i - 1, j, currentCellValue))
                         availableMoves.Add(Move.Up);
                     // down
-                    if (i + 1 < GameConfig.cGameBoardSize && CheckMoveAvailable(i + 1, j, currentCellValue))
+                    if (i + 1 < _gameConfig.gameBoardSize && CheckMoveAvailable(i + 1, j, currentCellValue))
                         availableMoves.Add(Move.Down);
 
                     if (availableMoves.Count == 4) {
@@ -308,5 +305,13 @@ namespace sample_game {
         //-------------------------------------------------------------
         // Handlers
         //-------------------------------------------------------------
+        
+        protected override void OnDependenciesFulfilled() {
+            // create game board
+            _boardState = new List<List<int>>(_gameConfig.gameBoardSize);
+            for (int i = 0; i < _gameConfig.gameBoardSize; i++) {
+                _boardState.Add(new int[_gameConfig.gameBoardSize].ToList());
+            }
+        }
     }
 } // namespace sample_game

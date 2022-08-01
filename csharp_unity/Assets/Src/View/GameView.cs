@@ -21,6 +21,8 @@ namespace sample_game {
         
         [DependencyInjector.DependencyAttribute]
         private GameBoardProxy _gameBoardProxy = default;
+        [DependencyInjector.DependencyAttribute]
+        private GameConfig _gameConfig = default;
         
         //-------------------------------------------------------------
         // Class constants
@@ -114,8 +116,8 @@ namespace sample_game {
             
             // update numbers on tiles
             var gameBoardState = _gameBoardProxy.boardState;
-            for (var i = 0; i < GameConfig.cGameBoardSize; i++) {
-                for (var j = 0; j < GameConfig.cGameBoardSize; j++) {
+            for (var i = 0; i < _gameConfig.gameBoardSize; i++) {
+                for (var j = 0; j < _gameConfig.gameBoardSize; j++) {
                     _tiles[i][j].numberValue = gameBoardState[i][j];
                 }
             }
@@ -140,7 +142,7 @@ namespace sample_game {
                 var tileDestination = CalcTileViewPosition(
                     tileMoveData.tileEndCoords.Item1, tileMoveData.tileEndCoords.Item2
                 );
-                var tileTween = tileToMove.rectTransform.DOAnchorPos(tileDestination, GameConfig.cTileMovementDuration);
+                var tileTween = tileToMove.rectTransform.DOAnchorPos(tileDestination, _gameConfig.tileMovementDuration);
 
                 _tilesMovementAnimation.Join(tileTween);
             }
@@ -159,8 +161,8 @@ namespace sample_game {
             }
 
             // place tiles to their initial positions
-            for (var i = 0; i < GameConfig.cGameBoardSize; i++) {
-                for (var j = 0; j < GameConfig.cGameBoardSize; j++) {
+            for (var i = 0; i < _gameConfig.gameBoardSize; i++) {
+                for (var j = 0; j < _gameConfig.gameBoardSize; j++) {
                     _tiles[i][j].rectTransform.anchoredPosition = CalcTileViewPosition(i, j);
                 }
             }
@@ -197,8 +199,8 @@ namespace sample_game {
             _background.sizeDelta = new Vector2(backgroundSize, backgroundSize);
             
             _tileSize = (backgroundSize -
-                         (GameConfig.cGameBoardSize + 1) * cGameBoardTileIndent
-                        ) / GameConfig.cGameBoardSize;
+                         (_gameConfig.gameBoardSize + 1) * cGameBoardTileIndent
+                        ) / _gameConfig.gameBoardSize;
             
             // resize tile container
             var tileContainerSize = backgroundSize - _tileSize - 2 * cGameBoardTileIndent;
@@ -206,11 +208,11 @@ namespace sample_game {
 
             // create tiles and tile placeholders
             var tileSizeVec = new Vector2(_tileSize, _tileSize);
-            _tiles = new List<List<GameBoardTile>>(GameConfig.cGameBoardSize);
-            for (var i = 0; i < GameConfig.cGameBoardSize; i++) {
-                _tiles.Add(new List<GameBoardTile>(GameConfig.cGameBoardSize));
+            _tiles = new List<List<GameBoardTile>>(_gameConfig.gameBoardSize);
+            for (var i = 0; i < _gameConfig.gameBoardSize; i++) {
+                _tiles.Add(new List<GameBoardTile>(_gameConfig.gameBoardSize));
 
-                for (var j = 0; j < GameConfig.cGameBoardSize; j++) {
+                for (var j = 0; j < _gameConfig.gameBoardSize; j++) {
                     // placeholder
                     var tilePlaceholder = Instantiate(_gameBoardTilePlaceholderPrefab, _tileContainer).GetComponent<RectTransform>();
                     tilePlaceholder.sizeDelta = tileSizeVec;
@@ -229,6 +231,9 @@ namespace sample_game {
             _gameBoardProxy.TilesMoved += ShowTilesMovement;
             
             ShowActualBoardState();
+            
+            // register itself as a service
+            ServiceLocator.AddService(this);
         }
 
         private void TileMovementAnimationEndHandler() {

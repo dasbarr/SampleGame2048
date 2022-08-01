@@ -35,6 +35,8 @@ namespace sample_game {
         private InputManager _inputManager = default;
         [DependencyInjector.DependencyAttribute]
         private GameView _gameView = default;
+        [DependencyInjector.DependencyAttribute]
+        private GameConfig _gameConfig = default;
         
         //-------------------------------------------------------------
         // Class constants
@@ -138,7 +140,7 @@ namespace sample_game {
             }
             else {
                 // place new tiles before new turn
-                _gameBoardProxy.PlaceRandomTiles(GameConfig.cNumRandomTilesEachTurn);
+                _gameBoardProxy.PlaceRandomTiles(_gameConfig.numRandomTilesEachTurn);
                 if (_gameBoardProxy.hasAvailableMoves) {
                     // start new turn
                     SetGameState(GameState.WaitingForInput);
@@ -161,6 +163,9 @@ namespace sample_game {
         protected override void OnDependenciesFulfilled() {
             _inputManager.PlayedMoveInput += playerMove => MakeMove(playerMove);
             _gameView.TileMovementAnimationEnded += EndCurrentTurn;
+            
+            // start the game
+            StartNewGame();
         }
     }
 } // namespace sample_game
