@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using sample_game.utils;
-using UnityEngine.InputSystem.Utilities;
 
 namespace sample_game {
     

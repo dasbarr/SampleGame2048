@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem.Utilities;
+using System.Collections.Generic;
 
 namespace sample_game {
     
@@ -68,7 +68,7 @@ namespace sample_game {
         [Tooltip("Tile colors. Each color represents a tile with the number 2^N on it (2^1, 2^2 and so on)")]
         [SerializeField]
         private Color[] _tileColors;
-        public ReadOnlyArray<Color> tileColors => _tileColors;
+        public IReadOnlyList<Color> tileColors => _tileColors;
         
         [Tooltip("Text color for 2^1 a 2^2 tiles")]
         [SerializeField]
@@ -89,4 +89,4 @@ namespace sample_game {
         /// </summary>
         public int tileInitialValue => (int)Math.Log(numberOnNewTile, 2);
     }
-} // namespace ws.rn
+} // namespace sample_game
