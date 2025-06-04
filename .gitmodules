@@ -7,6 +7,3 @@
 [submodule "cpp/third_party/rapidjson"]
 	path = cpp/third_party/rapidjson
 	url = https://github.com/Tencent/rapidjson
-[submodule "csharp_unity/ThirdParty/DOTween"]
-	path = csharp_unity/ThirdParty/DOTween
-	url = https://github.com/Demigiant/dotween
